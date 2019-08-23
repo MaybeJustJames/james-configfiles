@@ -45,7 +45,7 @@ There are two things you can do about this warning:
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (elpy mu4e use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
+    (py-autopep8 flycheck elpy mu4e use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
  '(smtpmail-smtp-server "smtp.ugent.be")
  '(smtpmail-smtp-service 587))
 (custom-set-faces
@@ -144,11 +144,11 @@ There are two things you can do about this warning:
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 
-  :hook ((emacs-lisp-mode-hook
-	  eval-expression-minibuffer-setup-hook
-	  lisp-mode-hook
-	  lisp-interaction-mode-hook
-	  scheme-mode-hook) . enable-paredit-mode))
+  :hook ((emacs-lisp-mode
+	  eval-expression-minibuffer-setup
+	  lisp-mode
+	  lisp-interaction-mode
+	  scheme-mode) . enable-paredit-mode))
 
 (use-package slime
   :ensure t
@@ -170,13 +170,26 @@ There are two things you can do about this warning:
 
 
 ;; Python
+(use-package flycheck
+  :ensure t)
+
+(use-package py-autopep8
+  :ensure t)
+
 (use-package elpy
+  :after (flycheck py-autopep8)
   :ensure t
 
   :init
   (setq python-shell-interpreter "python3"
 	python-shell-interpreter-args "-i")
-  (elpy-enable))
+  (elpy-enable)
+
+  :config
+  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+
+  :hook ((elpy-mode . flycheck-mode)
+	 (elpy-mode . py-autopep8-enable-on-save)))
 
 ;; Finally, initialisation
 (add-hook 'emacs-startup-hook
