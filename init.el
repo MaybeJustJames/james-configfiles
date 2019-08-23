@@ -45,7 +45,7 @@ There are two things you can do about this warning:
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
+    (elpy mu4e use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
  '(smtpmail-smtp-server "smtp.ugent.be")
  '(smtpmail-smtp-service 587))
 (custom-set-faces
@@ -93,6 +93,8 @@ There are two things you can do about this warning:
 
 ;; Viewing markdown
 (use-package flymd
+  :ensure t
+
   :init
   (defun my-flymd-browser (url)
     (let ((browse-url-browser-function 'browse-url-firefox))
@@ -107,6 +109,8 @@ There are two things you can do about this warning:
       c-basic-offset 2)
 
 (use-package multiple-cursors
+  :ensure t
+
   :config
   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -114,6 +118,8 @@ There are two things you can do about this warning:
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
 (use-package ggtags
+  :ensure t
+
   :config
   (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
   (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
@@ -125,21 +131,28 @@ There are two things you can do about this warning:
 
 ;; Git
 (use-package magit
+  :ensure t
+
   :config
   (global-set-key (kbd "C-x g") 'magit-status))
 
 
 ;; Lisp
 (use-package paredit
+  :ensure t
+
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-  (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
+
+  :hook ((emacs-lisp-mode-hook
+	  eval-expression-minibuffer-setup-hook
+	  lisp-mode-hook
+	  lisp-interaction-mode-hook
+	  scheme-mode-hook) . enable-paredit-mode))
 
 (use-package slime
+  :ensure t
+
   :config
   (load (expand-file-name "~/quicklisp/slime-helper.el"))
   (setq inferior-lisp-program "sbcl"))
@@ -155,6 +168,15 @@ There are two things you can do about this warning:
 (setq gdb-many-windows t
       gdb-show-main t)
 
+
+;; Python
+(use-package elpy
+  :ensure t
+
+  :init
+  (setq python-shell-interpreter "python3"
+	python-shell-interpreter-args "-i")
+  (elpy-enable))
 
 ;; Finally, initialisation
 (add-hook 'emacs-startup-hook
