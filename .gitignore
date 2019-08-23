@@ -1,0 +1,10 @@
+.*~
+*~
+
+*.elc
+
+xmonad-x86_64-linux
+xmonad
+*.o
+*.hi
+*.errors
