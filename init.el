@@ -58,37 +58,46 @@ There are two things you can do about this warning:
 ;;; jacollie
 
 ;; Email
-(require 'mu4e)
-(setq mail-user-agent 'mu4e-user-agent)
-(setq mu4e-maildir "/home/jacol/.local/mail/VIB")
-(setq mu4e-sent-folder   "/Sent")
-(setq mu4e-drafts-folder "/Drafts")
-(setq mu4e-trash-folder  "/Trash")
-(setq mu4e-maildir-shortcuts
-      '(("/INBOX"  . ?i)
-        ("/Sent"   . ?s)
-        ("/Trash"  . ?t)))
-(setq mu4e-get-mail-command "offlineimap")
-(setq mu4e-compose-reply-to-address "james.collier@vib.be"
-      user-mail-address "james.collier@vib.be"
-      user-full-name  "James Collier")
+(use-package mu4e
+  :config
+  (setq mail-user-agent 'mu4e-user-agent)
+  (setq mu4e-maildir "/home/jacol/.local/mail/VIB")
+  (setq mu4e-sent-folder   "/Sent")
+  (setq mu4e-drafts-folder "/Drafts")
+  (setq mu4e-trash-folder  "/Trash")
+  (setq mu4e-maildir-shortcuts
+	'(("/INBOX"  . ?i)
+          ("/Sent"   . ?s)
+          ("/Trash"  . ?t)))
+  (setq mu4e-get-mail-command "offlineimap")
+  (setq mu4e-compose-reply-to-address "james.collier@vib.be"
+	user-mail-address "james.collier@vib.be"
+	user-full-name  "James Collier"))
 
-(setq smtpmail-default-smtp-server "smtp.ugent.be")
-(require 'smtpmail)
-(setq message-send-mail-function 'smtpmail-send-it
-      send-mail-function 'smtpmail-send-it
-      user-mail-address "james.collier@ugent.be"
-      ; starttls-use-gnutls t
-      ; smtpmail-starttls-credentials '(("smtp.ugent.be" 465 nil nil))
-      ; smtpmail-auth-credentials (expand-file-name "~/.ugent.gpg")
-      smtpmail-auth-credentials '(("smtp.ugent.be" 465 "jacollie" "!just4do1it2SQN"))
-      smtpmail-smtp-server "smtp.ugent.be"
-      smtpmail-local-domain "ugent.be"
-      smtpmail-sendto-domain "ugent.be"
-      smtpmail-smtp-user "jacollie"
-      smtpmail-stream-type 'ssl
-      smtpmail-smtp-service 465
-      smtpmail-debug-info t)
+(use-package smtpmail
+  :init  
+  (setq smtpmail-default-smtp-server "smtp.ugent.be")
+
+  :config
+  (setq message-send-mail-function 'smtpmail-send-it
+	send-mail-function 'smtpmail-send-it
+	user-mail-address "james.collier@ugent.be"
+	smtpmail-auth-credentials '(("smtp.ugent.be" 465 "jacollie" "!just4do1it2SQN"))
+	smtpmail-smtp-server "smtp.ugent.be"
+	smtpmail-local-domain "ugent.be"
+	smtpmail-sendto-domain "ugent.be"
+	smtpmail-smtp-user "jacollie"
+	smtpmail-stream-type 'ssl
+	smtpmail-smtp-service 465
+	smtpmail-debug-info t))
+
+;; Viewing markdown
+(use-package flymd
+  :init
+  (defun my-flymd-browser (url)
+    (let ((browse-url-browser-function 'browse-url-firefox))
+      (browse-url url)))
+  (setq flymd-browser-open-function 'my-flymd-browser))
 
 ;; General dev
 (show-paren-mode 1)
@@ -97,38 +106,43 @@ There are two things you can do about this warning:
       c-default-style "linux"
       c-basic-offset 2)
 
-(require 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+(use-package multiple-cursors
+  :config
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
-(require 'ggtags)
-(define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
-(define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
-(define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
-(define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
-(define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
-(define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
+(use-package ggtags
+  :config
+  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
+  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
+  (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
+  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
+  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
+  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags))
 
 
 ;; Git
-(require 'magit)
-(global-set-key (kbd "C-x g") 'magit-status)
+(use-package magit
+  :config
+  (global-set-key (kbd "C-x g") 'magit-status))
 
 
 ;; Lisp
-(require 'paredit)
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+(use-package paredit
+  :config
+  (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+  (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook           #'enable-paredit-mode))
 
-(require 'slime)
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
-(setq inferior-lisp-program "sbcl")
+(use-package slime
+  :config
+  (load (expand-file-name "~/quicklisp/slime-helper.el"))
+  (setq inferior-lisp-program "sbcl"))
 
 ;; Haskell
 
@@ -147,6 +161,4 @@ There are two things you can do about this warning:
 	  (lambda ()
 	    (let ((w (split-window-right)))
 	      (select-window w)
-	      (mu4e)
-	      (mu4e-update-mail-and-index)
-	      (mu4e-headers-jump-to-maildir "/INBOX"))))
+	      (mu4e))))
