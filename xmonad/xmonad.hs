@@ -116,6 +116,6 @@ main = do
 	, terminal = "xfce4-terminal"
         , workspaces = myWorkspaces
         , startupHook = startupHook xfceConfig <+> myStartupHook
-        , modMask = mod4Mask     -- Rebind Mod to the Windows key
+        , modMask = mod3Mask     -- Rebind Mod to the Caps_Lock key
         , keys = myKeys
         }
