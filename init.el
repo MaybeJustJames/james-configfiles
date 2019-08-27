@@ -161,6 +161,8 @@ There are two things you can do about this warning:
   :bind
   (("C-c p" . projectile-command-map)))
 
+(use-package company
+  :ensure t)
 
 ;; Git
 (use-package magit
@@ -254,17 +256,33 @@ There are two things you can do about this warning:
 
 
 ;; TypeScript
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq lycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
 (use-package typescript-mode
-  :ensure t)
+  :ensure t
+
+  :after (company flycheck)
+
+  :hook ((typescript-mode . setup-tide-mode)))
 
 (use-package tide
   :ensure t
 
-  :after (typescript-mode company flycheck)
+  :after (typescript-mode)
 
   :init
-  (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil
-                                                                                    :indentSize 4 :tabSize 4))
+  (setq tide-format-options
+        '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
+          :placeOpenBraceOnNewLineForFunctions nil
+          :indentSize 4
+          :tabSize 4))
 
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
