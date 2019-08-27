@@ -10,6 +10,13 @@
 (tool-bar-mode -1)
 (toggle-scroll-bar -1)
 
+;;Global useful stuff
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+
 ;; Package management
 (require 'package)
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
@@ -50,9 +57,7 @@ There are two things you can do about this warning:
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (py-autopep8 flycheck elpy mu4e use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
- '(smtpmail-smtp-server "smtp.ugent.be")
- '(smtpmail-smtp-service 587))
+    (tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -81,17 +86,17 @@ There are two things you can do about this warning:
 
 (use-package smtpmail
   :init  
-  (setq smtpmail-default-smtp-server "smtp.ugent.be")
+  (setq smtpmail-default-smtp-server "dev.bits.vib.be")
 
   :config
   (setq message-send-mail-function 'smtpmail-send-it
 	send-mail-function 'smtpmail-send-it
-	user-mail-address "james.collier@ugent.be"
-	smtpmail-auth-credentials '(("smtp.ugent.be" 465 "jacollie" "!just4do1it2SQN"))
-	smtpmail-smtp-server "smtp.ugent.be"
-	smtpmail-local-domain "ugent.be"
-	smtpmail-sendto-domain "ugent.be"
-	smtpmail-smtp-user "jacollie"
+	user-mail-address "james.collier@vib.be"
+	smtpmail-auth-credentials '(("dev.bits.vib.be" 465 "jacol" "1!just4do1it2SQN"))
+	smtpmail-smtp-server "dev.bits.vib.be"
+	smtpmail-local-domain "vib.be"
+	smtpmail-sendto-domain "vib.be"
+	smtpmail-smtp-user "jacol"
 	smtpmail-stream-type 'ssl
 	smtpmail-smtp-service 465
 	smtpmail-debug-info t))
@@ -107,11 +112,25 @@ There are two things you can do about this warning:
   (setq flymd-browser-open-function 'my-flymd-browser))
 
 ;; General dev
-(show-paren-mode 1)
 (setq column-number-mode t)
-(setq show-paren-style 'mixed
-      c-default-style "linux"
+(setq c-default-style "linux"
       c-basic-offset 2)
+(setq-default indent-tabs-mode nil
+              tab-width 2
+              indicate-empty-lines nil)
+
+(use-package paren
+  :config
+  (show-paren-mode)
+  (setq show-paren-style 'mixed))
+
+(use-package repl-toggle
+  :ensure t
+
+  :config
+  (setq rtog/mode-repl-alist '((lisp-mode . slime)
+                               (python-mode . elpy-shell-switch-to-shell)
+                               (purescript-mode . psci))))
 
 (use-package multiple-cursors
   :ensure t
@@ -125,13 +144,22 @@ There are two things you can do about this warning:
 (use-package ggtags
   :ensure t
 
+  :bind
+  (("C-c g s" . ggtags-find-other-symbol)
+   ("C-c g h" . ggtags-view-tag-history)
+   ("C-c g r" . ggtags-find-reference)
+   ("C-c g f" . ggtags-find-file)
+   ("C-c g c" . ggtags-create-tags)
+   ("C-c g u" . ggtags-update-tags)))
+
+(use-package projectile
+  :ensure t
+
   :config
-  (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
-  (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
-  (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
-  (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
-  (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
-  (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags))
+  (projectile-mode +1)
+
+  :bind
+  (("C-c p" . projectile-command-map)))
 
 
 ;; Git
@@ -182,7 +210,7 @@ There are two things you can do about this warning:
   :ensure t)
 
 (use-package elpy
-  :after (flycheck py-autopep8)
+  :after (flycheck py-autopep8 repl-toggle)
   :ensure t
 
   :init
@@ -195,6 +223,52 @@ There are two things you can do about this warning:
 
   :hook ((elpy-mode . flycheck-mode)
 	 (elpy-mode . py-autopep8-enable-on-save)))
+
+;; Purescript
+(use-package psci
+  :ensure t)
+
+(use-package purescript-mode
+  :after (repl-toggle psci)
+  :ensure t
+
+  :init
+  (setq exec-path (cons (expand-file-name "~/.npm/bin") exec-path))
+
+  :config
+  (use-package psc-ide
+    :ensure t
+    :config
+    (setq psc-ide-use-npm-bin t))
+
+  :bind
+  (("C-," . purescript-move-nested-left)
+   ("C-." . purescript-move-nested-right))
+
+  :hook ((purescript-mode . turn-on-purescript-unicode-input-method)
+	 (purescript-mode . turn-on-purescript-indentation)
+	 (purescript-mode . psc-ide-mode)
+	 (purescript-mode . company-mode)
+	 (purescript-mode . flycheck-mode)
+	 (purescript-mode . inferior-psci-mode)))
+
+
+;; TypeScript
+(use-package typescript-mode
+  :ensure t)
+
+(use-package tide
+  :ensure t
+
+  :after (typescript-mode company flycheck)
+
+  :init
+  (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil
+                                                                                    :indentSize 4 :tabSize 4))
+
+  :hook ((typescript-mode . tide-setup)
+         (typescript-mode . tide-hl-identifier-mode)
+         (before-save . tide-format-before-save)))
 
 ;; Finally, initialisation
 (add-hook 'emacs-startup-hook
