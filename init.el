@@ -45,27 +45,45 @@ There are two things you can do about this warning:
   (require 'use-package))
 
 
-;; Customizations
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#21252B" "#E06C75" "#98C379" "#E5C07B" "#61AFEF" "#C678DD" "#56B6C2" "#ABB2BF"])
- '(custom-enabled-themes (quote (manoj-dark)))
- '(haskell-stylish-on-save t)
- '(package-selected-packages
-   (quote
-    (tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-;; UGent login
-;;; jacollie
+
+;; Customize
+(setq custom-file "~/.emacs.d/.emacs-customize.el")
+(load custom-file)
+
+;; Use 'y' or 'n' rather than 'yes' or 'no\
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;; project management
+(use-package projectile
+  :ensure t
+
+  :config
+  (projectile-mode +1)
+
+  :bind
+  (("C-c p" . projectile-command-map)))
+
+;; Change active window
+(use-package windmove
+  :ensure nil
+  :bind (("C-s-<left>" . windmove-left)
+         ("C-s-<right>" . windmove-right)
+         ("C-s-<up>" . windmove-up)
+         ("C-s-<down>" . windmove-down)))
+
+;; Window title
+(defun frame-title-format ()
+  "Evaluate to current project name, where applicable"
+  (concat
+   "emacs - "
+   (when (and (bound-and-true-p projectile-mode)
+              (projecttile-project-p))
+     (format "[%s] - " (projectile-project-name)))
+   (let ((file buffer-file-name))
+     (if file
+         (abbreviate-file-name file)
+       "%b"))))
+(setq-default frame-title-format '((:eval (frame-title-format))))
 
 ;; Email
 (use-package mu4e
@@ -118,6 +136,12 @@ There are two things you can do about this warning:
 (setq-default indent-tabs-mode nil
               tab-width 2
               indicate-empty-lines nil)
+(global-hl-line-mode 1)
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (interactive)
+            (hs-minor-mode 1) ;; Fold code with C-c @ C-c
+            (display-line-numbers-mode)))
 
 (use-package paren
   :config
@@ -152,17 +176,37 @@ There are two things you can do about this warning:
    ("C-c g c" . ggtags-create-tags)
    ("C-c g u" . ggtags-update-tags)))
 
-(use-package projectile
-  :ensure t
-
-  :config
-  (projectile-mode +1)
-
-  :bind
-  (("C-c p" . projectile-command-map)))
-
 (use-package company
   :ensure t)
+
+(defun +sidebar-toggle ()
+  "Toggle both `dired-sidebar' and `ibuffer-sidebar'"
+  (interactive)
+  (dired-sidebar-toggle-sidebar)
+  (ibuffer-sidebar-toggle-sidebar))
+
+(use-package ibuffer-sidebar
+  :ensure t
+  :commands (ibuffer-sidebar-toggle-sidebar))
+
+(use-package dired-sidebar
+  :ensure t
+
+  :after ibuffer-sidebar
+  
+  :bind
+  (("C-c C-b" . +sidebar-toggle))
+
+  :commands (dired-sidebar-toggle-sidebar)
+
+  :hook
+  (dired-sidebar-mode-hook . (lambda ()
+                               (unless (file-remote-p default-directory)
+                                 (auto-revert-mode))))
+
+  :config
+  (setq dired-sidebar-subtree-line-prefix "__")
+  (setq dired-sidebar-use-term-integration t))
 
 ;; Git
 (use-package magit
@@ -260,10 +304,13 @@ There are two things you can do about this warning:
   (interactive)
   (tide-setup)
   (flycheck-mode +1)
-  (setq lycheck-check-syntax-automatically '(save mode-enabled))
+  (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled)
+        flycheck-auto-change-delay 1.5)
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
-  (company-mode +1))
+  (company-mode +1)
+  (setq typescript-indent-level 2
+        typescript-expr-indent-offset 0))
 
 (use-package typescript-mode
   :ensure t
@@ -275,14 +322,14 @@ There are two things you can do about this warning:
 (use-package tide
   :ensure t
 
-  :after (typescript-mode)
+  :after (flycheck typescript-mode)
 
-  :init
-  (setq tide-format-options
-        '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
-          :placeOpenBraceOnNewLineForFunctions nil
-          :indentSize 4
-          :tabSize 4))
+  ;; :config
+  ;; (setq tide-format-options
+  ;;       '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
+  ;;         :placeOpenBraceOnNewLineForFunctions nil
+  ;;         :indentSize 2
+  ;;         :tabSize 2))
 
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
@@ -290,7 +337,8 @@ There are two things you can do about this warning:
 
 ;; Finally, initialisation
 (add-hook 'emacs-startup-hook
-	  (lambda ()
-	    (let ((w (split-window-right)))
-	      (select-window w)
-	      (mu4e))))
+	          (lambda ()
+	            (let ((w (split-window-right)))
+	              (select-window w)
+	              (mu4e))))
+(put 'upcase-region 'disabled nil)
