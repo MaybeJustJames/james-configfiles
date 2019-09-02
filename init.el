@@ -85,6 +85,7 @@ There are two things you can do about this warning:
        "%b"))))
 (setq-default frame-title-format '((:eval (frame-title-format))))
 
+
 ;; Email
 (use-package mu4e
   :config
@@ -193,9 +194,6 @@ There are two things you can do about this warning:
   :ensure t
 
   :after ibuffer-sidebar
-  
-  :bind
-  (("C-c C-b" . +sidebar-toggle))
 
   :commands (dired-sidebar-toggle-sidebar)
 
@@ -207,6 +205,7 @@ There are two things you can do about this warning:
   :config
   (setq dired-sidebar-subtree-line-prefix "__")
   (setq dired-sidebar-use-term-integration t))
+(global-set-key (kbd "C-c C-b") '+sidebar-toggle)
 
 ;; Git
 (use-package magit
