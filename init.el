@@ -19,6 +19,8 @@
 
 ;; Package management
 (require 'package)
+(if (and (version< emacs-version "26.3") (>= libgnutls-version 30604))
+    (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                     (not (gnutls-available-p))))
        (proto (if no-ssl "http" "https")))
@@ -226,7 +228,8 @@ There are two things you can do about this warning:
 	  eval-expression-minibuffer-setup
 	  lisp-mode
 	  lisp-interaction-mode
-	  scheme-mode) . enable-paredit-mode))
+	  scheme-mode
+    clojure-mode) . enable-paredit-mode))
 
 (use-package slime
   :ensure t
