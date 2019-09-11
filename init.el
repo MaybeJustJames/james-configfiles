@@ -1,4 +1,6 @@
-;; Emacs config for James Collier
+;;; Init -- Emacs config for James Collier
+;;; Commentary:
+
 ;;; Code:
 
 ;; Fix backups
@@ -79,7 +81,7 @@ There are two things you can do about this warning:
   (concat
    "emacs - "
    (when (and (bound-and-true-p projectile-mode)
-              (projecttile-project-p))
+              (projectile-project-p))
      (format "[%s] - " (projectile-project-name)))
    (let ((file buffer-file-name))
      (if file
@@ -182,6 +184,11 @@ There are two things you can do about this warning:
 (use-package company
   :ensure t)
 
+;; Enable nice rendering of diagnostics like compile errors.
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 (defun +sidebar-toggle ()
   "Toggle both `dired-sidebar' and `ibuffer-sidebar'"
   (interactive)
@@ -241,6 +248,42 @@ There are two things you can do about this warning:
 ;; Haskell
 
 
+;; Idris
+(use-package idris-mode
+  :ensure t)
+
+
+;; Scala
+(use-package scala-mode
+  :ensure t
+  :mode "\\.s\\(cala\\|bt\\)$")
+
+(use-package sbt-mode
+  :ensure t
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map))
+
+(use-package lsp-mode
+  :ensure t
+  ;; Optional - enable lsp-mode automatically in scala files
+  :hook (scala-mode . lsp)
+  :config (setq lsp-prefer-flymake nil))
+
+(use-package lsp-ui
+  :ensure t)
+
+;; Add company-lsp backend for metals
+(use-package company-lsp
+  :ensure t)
+
+
+
 ;; C-type lanaguages
 (add-hook 'c-mode-common-hook
 	  (lambda ()
@@ -251,8 +294,6 @@ There are two things you can do about this warning:
 
 
 ;; Python
-(use-package flycheck
-  :ensure t)
 
 (use-package py-autopep8
   :ensure t)
@@ -327,15 +368,16 @@ There are two things you can do about this warning:
   :after (flycheck typescript-mode)
 
   ;; :config
-  ;; (setq tide-format-options
-  ;;       '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
-  ;;         :placeOpenBraceOnNewLineForFunctions nil
-  ;;         :indentSize 2
-  ;;         :tabSize 2))
+  (setq tide-format-options
+        '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
+          :placeOpenBraceOnNewLineForFunctions nil
+          :indentSize 2
+          :tabSize 2))
 
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
-         (before-save . tide-format-before-save)))
+         ;(before-save . tide-format-before-save)
+         ))
 
 ;; Finally, initialisation
 (add-hook 'emacs-startup-hook
@@ -344,3 +386,7 @@ There are two things you can do about this warning:
 	              (select-window w)
 	              (mu4e))))
 (put 'upcase-region 'disabled nil)
+
+(provide 'init)
+;;; init.el ends here
+
