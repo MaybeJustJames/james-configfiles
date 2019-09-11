@@ -12,5 +12,5 @@ Config {  bgColor = "#efefef"
                         ]
         , sepChar = "%"
         , alignSep = "}{"
-        , template = "%StdinReader% | %cpu% | %memory% * %swap%}{<fc=#1abc9c>%date% %uptime%</fc> | Volume: %volume% "
+        , template = "%StdinReader%}{ %cpu% | %memory% * %swap% | <fc=#1abc9c>%date% %uptime%</fc> | Volume: %volume% "
         }
