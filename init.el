@@ -77,7 +77,7 @@ There are two things you can do about this warning:
 
 ;; Window title
 (defun frame-title-format ()
-  "Evaluate to current project name, where applicable"
+  "Evaluate to current project name, where applicable."
   (concat
    "emacs - "
    (when (and (bound-and-true-p projectile-mode)
@@ -190,7 +190,7 @@ There are two things you can do about this warning:
   :init (global-flycheck-mode))
 
 (defun +sidebar-toggle ()
-  "Toggle both `dired-sidebar' and `ibuffer-sidebar'"
+  "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
   (interactive)
   (dired-sidebar-toggle-sidebar)
   (ibuffer-sidebar-toggle-sidebar))
@@ -246,6 +246,8 @@ There are two things you can do about this warning:
   (setq inferior-lisp-program "sbcl"))
 
 ;; Haskell
+(use-package haskell-mode
+  :ensure t)
 
 
 ;; Idris
@@ -272,11 +274,15 @@ There are two things you can do about this warning:
 (use-package lsp-mode
   :ensure t
   ;; Optional - enable lsp-mode automatically in scala files
-  :hook (scala-mode . lsp)
-  :config (setq lsp-prefer-flymake nil))
+  :hook ((scala-mode . lsp)
+         (elm-mode . lsp))
+  :config (setq lsp-prefer-flymake nil)
+
+  :commands lsp)
 
 (use-package lsp-ui
-  :ensure t)
+  :ensure t
+  :commands lsp-ui-mode)
 
 ;; Add company-lsp backend for metals
 (use-package company-lsp
@@ -294,7 +300,6 @@ There are two things you can do about this warning:
 
 
 ;; Python
-
 (use-package py-autopep8
   :ensure t)
 
@@ -311,7 +316,7 @@ There are two things you can do about this warning:
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
 
   :hook ((elpy-mode . flycheck-mode)
-	 (elpy-mode . py-autopep8-enable-on-save)))
+	       (elpy-mode . py-autopep8-enable-on-save)))
 
 ;; Purescript
 (use-package psci
@@ -335,11 +340,20 @@ There are two things you can do about this warning:
    ("C-." . purescript-move-nested-right))
 
   :hook ((purescript-mode . turn-on-purescript-unicode-input-method)
-	 (purescript-mode . turn-on-purescript-indentation)
-	 (purescript-mode . psc-ide-mode)
-	 (purescript-mode . company-mode)
-	 (purescript-mode . flycheck-mode)
-	 (purescript-mode . inferior-psci-mode)))
+	       (purescript-mode . turn-on-purescript-indentation)
+	       (purescript-mode . psc-ide-mode)
+	       (purescript-mode . company-mode)
+	       (purescript-mode . flycheck-mode)
+	       (purescript-mode . inferior-psci-mode)))
+
+
+;; Elm
+(use-package elm-mode
+  :ensure t
+
+  :config
+  (setq elm-format-on-save t)
+  (add-to-list 'company-backends 'company-elm))
 
 
 ;; TypeScript
@@ -367,7 +381,7 @@ There are two things you can do about this warning:
 
   :after (flycheck typescript-mode)
 
-  ;; :config
+  :config
   (setq tide-format-options
         '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
           :placeOpenBraceOnNewLineForFunctions nil
@@ -390,3 +404,4 @@ There are two things you can do about this warning:
 (provide 'init)
 ;;; init.el ends here
 
+(put 'downcase-region 'disabled nil)
