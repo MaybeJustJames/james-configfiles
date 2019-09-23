@@ -108,14 +108,13 @@ There are two things you can do about this warning:
 	user-full-name  "James Collier"))
 
 (use-package smtpmail
-  :init  
+  :init
   (setq smtpmail-default-smtp-server "dev.bits.vib.be")
 
   :config
   (setq message-send-mail-function 'smtpmail-send-it
 	send-mail-function 'smtpmail-send-it
 	user-mail-address "james.collier@vib.be"
-	smtpmail-auth-credentials '(("dev.bits.vib.be" 465 "jacol" "1!just4do1it2SQN"))
 	smtpmail-smtp-server "dev.bits.vib.be"
 	smtpmail-local-domain "vib.be"
 	smtpmail-sendto-domain "vib.be"
@@ -358,6 +357,7 @@ There are two things you can do about this warning:
 
 ;; TypeScript
 (defun setup-tide-mode ()
+  "Tide mode is a bit complicated to set up."
   (interactive)
   (tide-setup)
   (flycheck-mode +1)
@@ -403,5 +403,3 @@ There are two things you can do about this warning:
 
 (provide 'init)
 ;;; init.el ends here
-
-(put 'downcase-region 'disabled nil)
