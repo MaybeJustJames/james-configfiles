@@ -222,6 +222,16 @@ There are two things you can do about this warning:
   :config
   (global-set-key (kbd "C-x g") 'magit-status))
 
+;; Rainbow delimiters
+(use-package rainbow-delimiters
+  :ensure t
+
+  :hook ((emacs-lisp-mode
+          lisp-mode
+          lisp-interaction-mode
+          scheme-mode
+          clojure-mode) . rainbow-delimiters-mode))
+
 
 ;; Lisp
 (use-package paredit
@@ -231,11 +241,11 @@ There are two things you can do about this warning:
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 
   :hook ((emacs-lisp-mode
-	  eval-expression-minibuffer-setup
-	  lisp-mode
-	  lisp-interaction-mode
-	  scheme-mode
-    clojure-mode) . enable-paredit-mode))
+	        eval-expression-minibuffer-setup
+	        lisp-mode
+	        lisp-interaction-mode
+	        scheme-mode
+          clojure-mode) . enable-paredit-mode))
 
 (use-package slime
   :ensure t
@@ -244,9 +254,19 @@ There are two things you can do about this warning:
   (load (expand-file-name "~/quicklisp/slime-helper.el"))
   (setq inferior-lisp-program "sbcl"))
 
+;; Clojure
+(use-package clojure-mode
+  :ensure
+
+  :hook ((clojure-mode . subword-mode)))
+
 ;; Haskell
 (use-package haskell-mode
-  :ensure t)
+  :ensure t
+
+  :hook ((haskell-mode . subword-mode)
+         (haskell-mode . interactive-haskell-mode)
+         (haskell-mode . haskell-doc-mode)))
 
 
 ;; Idris
@@ -270,8 +290,10 @@ There are two things you can do about this warning:
    'self-insert-command
    minibuffer-local-completion-map))
 
+;; Language server protocol
 (use-package lsp-mode
   :ensure t
+  ; :load-path "~/Documents/lsp-mode"
   ;; Optional - enable lsp-mode automatically in scala files
   :hook ((scala-mode . lsp)
          (elm-mode . lsp))
@@ -349,7 +371,7 @@ There are two things you can do about this warning:
 ;; Elm
 (use-package elm-mode
   :ensure t
-
+  :load-path "~/Documents/elm-mode"
   :config
   (setq elm-format-on-save t)
   (add-to-list 'company-backends 'company-elm))
@@ -403,3 +425,4 @@ There are two things you can do about this warning:
 
 (provide 'init)
 ;;; init.el ends here
+(put 'downcase-region 'disabled nil)
