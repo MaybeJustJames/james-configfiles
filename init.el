@@ -230,7 +230,8 @@ There are two things you can do about this warning:
           lisp-mode
           lisp-interaction-mode
           scheme-mode
-          clojure-mode) . rainbow-delimiters-mode))
+          clojure-mode
+          cider-repl-mode) . rainbow-delimiters-mode))
 
 
 ;; Lisp
@@ -245,7 +246,8 @@ There are two things you can do about this warning:
 	        lisp-mode
 	        lisp-interaction-mode
 	        scheme-mode
-          clojure-mode) . enable-paredit-mode))
+          clojure-mode
+          cider-repl-mode) . enable-paredit-mode))
 
 (use-package slime
   :ensure t
@@ -259,6 +261,15 @@ There are two things you can do about this warning:
   :ensure
 
   :hook ((clojure-mode . subword-mode)))
+
+(use-package cider
+  :ensure t
+
+  :config
+  (setq nrepl-log-messages t)
+
+  :hook ((cider-mode . eldoc-mode)
+         (cider-repl-mode . eldoc-mode)))
 
 ;; Haskell
 (use-package haskell-mode
