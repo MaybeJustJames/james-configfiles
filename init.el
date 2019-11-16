@@ -18,6 +18,13 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
+;; Fix PATH
+(eval-when-compile
+  (setenv "PATH"
+          (concat (getenv "PATH") ":" (expand-file-name "~/.local/bin/")))
+  (setq exec-path
+        (append exec-path (list (expand-file-name "~/.local/bin")))))
+
 
 ;; Package management
 (require 'package)
@@ -141,11 +148,22 @@ There are two things you can do about this warning:
               tab-width 2
               indicate-empty-lines nil)
 (global-hl-line-mode 1)
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (interactive)
-            (hs-minor-mode 1) ;; Fold code with C-c @ C-c
-            (display-line-numbers-mode)))
+
+(defun my-prog-mode-setup ()
+  "General customisation for programming modes."
+  (hs-minor-mode 1) ;; Fold code with C-c @ C-c
+  (display-line-numbers-mode)
+
+  ;; Special setup for HTML+ and tagedit
+  (if (string= "mhtml-mode" major-mode)
+      (progn
+        (require 'tagedit)
+        (tagedit-mode 1)
+        (tagedit-add-paredit-like-keybindings)
+        (tagedit-add-experimental-features)))
+  )
+
+(add-hook 'prog-mode-hook #'my-prog-mode-setup)
 
 (use-package paren
   :config
@@ -157,6 +175,7 @@ There are two things you can do about this warning:
 
   :config
   (setq rtog/mode-repl-alist '((lisp-mode . slime)
+                               (emacs-lisp-mode . ielm)
                                (python-mode . elpy-shell-switch-to-shell)
                                (purescript-mode . psci))))
 
@@ -233,6 +252,15 @@ There are two things you can do about this warning:
           clojure-mode
           cider-repl-mode) . rainbow-delimiters-mode))
 
+(use-package tagedit
+  :ensure t
+  :demand
+
+  :after (sgml-mode html-mode mhtml-mode)
+
+  :config
+  (tagedit-add-paredit-like-keybindings)
+  (tagedit-add-experimental-features))
 
 ;; Lisp
 (use-package paredit
@@ -257,6 +285,16 @@ There are two things you can do about this warning:
   (setq inferior-lisp-program "sbcl"))
 
 ;; Clojure
+(defun repl-cider-refresh ()
+  "Reset the REPL."
+  (interactive)
+  (cider-interactive-eval (format "(user/reset)")))
+
+(defun repl-cider-user-ns ()
+  "Set the REPL ns to user."
+  (interactive)
+  (cider-repl-set-ns "user"))
+
 (use-package clojure-mode
   :ensure
 
@@ -265,8 +303,15 @@ There are two things you can do about this warning:
 (use-package cider
   :ensure t
 
+  :after (clojure)
+
   :config
   (setq nrepl-log-messages t)
+
+  :bind
+  (:map clojure-mode-map
+   ("C-M-r" . repl-cider-refresh)
+   ("C-c u" . repl-cider-user-ns))
 
   :hook ((cider-mode . eldoc-mode)
          (cider-repl-mode . eldoc-mode)))
@@ -346,6 +391,7 @@ There are two things you can do about this warning:
 
   :config
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (setq elpy-rpc-python-command "python3")
 
   :hook ((elpy-mode . flycheck-mode)
 	       (elpy-mode . py-autopep8-enable-on-save)))
@@ -427,11 +473,11 @@ There are two things you can do about this warning:
          ))
 
 ;; Finally, initialisation
-(add-hook 'emacs-startup-hook
-	          (lambda ()
-	            (let ((w (split-window-right)))
-	              (select-window w)
-	              (mu4e))))
+;; (add-hook 'emacs-startup-hook
+;; 	          (lambda ()
+;; 	            (let ((w (split-window-right)))
+;; 	              (select-window w)
+;; 	              (mu4e))))
 (put 'upcase-region 'disabled nil)
 
 (provide 'init)
