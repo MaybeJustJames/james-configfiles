@@ -21,9 +21,12 @@
 ;; Fix PATH
 (eval-when-compile
   (setenv "PATH"
-          (concat (getenv "PATH") ":" (expand-file-name "~/.local/bin/")))
+          (concat (getenv "PATH")
+                  ":" (expand-file-name "~/.local/bin/")
+                  ":" (expand-file-name "~/.npm/bin/")))
   (setq exec-path
-        (append exec-path (list (expand-file-name "~/.local/bin")))))
+        (append exec-path (list (expand-file-name "~/.local/bin")
+                                (expand-file-name "~/.npm/bin")))))
 
 
 ;; Package management
@@ -96,6 +99,11 @@ There are two things you can do about this warning:
        "%b"))))
 (setq-default frame-title-format '((:eval (frame-title-format))))
 
+;; Show number of search matches
+(use-package anzu
+  :ensure t
+  :config
+  (global-anzu-mode +1))
 
 ;; Email
 (use-package mu4e
@@ -147,12 +155,13 @@ There are two things you can do about this warning:
 (setq-default indent-tabs-mode nil
               tab-width 2
               indicate-empty-lines nil)
-(global-hl-line-mode 1)
+;;(global-hl-line-mode 1)
 
 (defun my-prog-mode-setup ()
   "General customisation for programming modes."
   (hs-minor-mode 1) ;; Fold code with C-c @ C-c
   (display-line-numbers-mode)
+  (prettify-symbols-mode)
 
   ;; Special setup for HTML+ and tagedit
   (if (string= "mhtml-mode" major-mode)
@@ -177,7 +186,8 @@ There are two things you can do about this warning:
   (setq rtog/mode-repl-alist '((lisp-mode . slime)
                                (emacs-lisp-mode . ielm)
                                (python-mode . elpy-shell-switch-to-shell)
-                               (purescript-mode . psci))))
+                               (purescript-mode . psci)
+                               (elm-mode . elm-repl-load))))
 
 (use-package multiple-cursors
   :ensure t
@@ -275,6 +285,7 @@ There are two things you can do about this warning:
 	        lisp-interaction-mode
 	        scheme-mode
           clojure-mode
+          clojurescript-mode
           cider-repl-mode) . enable-paredit-mode))
 
 (use-package slime
@@ -295,10 +306,22 @@ There are two things you can do about this warning:
   (interactive)
   (cider-repl-set-ns "user"))
 
+(defun setup-clojure-mode ()
+  "Initialise nice things for clojure."
+  (interactive)
+  (clj-refactor-mode 1)
+  (yas-minor-mode 1)
+  (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+(use-package clj-refactor
+  :ensure t
+
+  :hook (clojure-mode . setup-clojure-mode))
+
 (use-package clojure-mode
   :ensure
 
-  :hook ((clojure-mode . subword-mode)))
+  :hook (clojure-mode . subword-mode))
 
 (use-package cider
   :ensure t
@@ -428,7 +451,7 @@ There are two things you can do about this warning:
 ;; Elm
 (use-package elm-mode
   :ensure t
-  :load-path "~/Documents/elm-mode"
+  ;; :load-path "~/Documents/elm-mode"
   :config
   (setq elm-format-on-save t)
   (add-to-list 'company-backends 'company-elm))
