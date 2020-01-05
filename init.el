@@ -148,6 +148,13 @@ There are two things you can do about this warning:
       (browse-url url)))
   (setq flymd-browser-open-function 'my-flymd-browser))
 
+;; YAML
+(use-package yaml-mode
+  :ensure t
+
+  :config
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+
 ;; General dev
 (setq column-number-mode t)
 (setq c-default-style "linux"
@@ -423,24 +430,23 @@ There are two things you can do about this warning:
 (use-package psci
   :ensure t)
 
+(use-package psc-ide
+  :ensure t
+  :config
+  (setq psc-ide-use-npm-bin t))
+
 (use-package purescript-mode
-  :after (repl-toggle psci)
   :ensure t
 
   :init
   (setq exec-path (cons (expand-file-name "~/.npm/bin") exec-path))
 
-  :config
-  (use-package psc-ide
-    :ensure t
-    :config
-    (setq psc-ide-use-npm-bin t))
-
   :bind
   (("C-," . purescript-move-nested-left)
    ("C-." . purescript-move-nested-right))
 
-  :hook ((purescript-mode . turn-on-purescript-unicode-input-method)
+  ;; The unicode input method inserts characters not accepted by purs
+  :hook (;;(purescript-mode . turn-on-purescript-unicode-input-method)
 	       (purescript-mode . turn-on-purescript-indentation)
 	       (purescript-mode . psc-ide-mode)
 	       (purescript-mode . company-mode)
@@ -453,7 +459,7 @@ There are two things you can do about this warning:
   :ensure t
   ;; :load-path "~/Documents/elm-mode"
   :config
-  (setq elm-format-on-save t)
+  (setq elm-tags-on-save t)
   (add-to-list 'company-backends 'company-elm))
 
 
