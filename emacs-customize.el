@@ -30,9 +30,10 @@
  '(js-indent-level 2)
  '(lsp-elm-elm-path "/home/jacol/.npm/bin/elm")
  '(lsp-log-io t)
+ '(markdown-command "pandoc -f gfm -t html")
  '(package-selected-packages
    (quote
-    (yaml-mode anzu clj-refactor tagedit rainbow-delimiters php-mode elm-mode company-lsp lsp-ui lsp-mode sbt-mode scala-mode idris-mode cider clojure-mode all-the-icons dired-sidebar ibuffer-sidebar tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode flymd ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
+    (markdown-preview-mode prettier-js yaml-mode anzu clj-refactor tagedit rainbow-delimiters php-mode elm-mode company-lsp lsp-ui lsp-mode sbt-mode scala-mode idris-mode cider clojure-mode all-the-icons dired-sidebar ibuffer-sidebar tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
  '(set-mark-command-repeat-pop t)
  '(typescript-indent-level 2))
 (custom-set-faces

@@ -139,14 +139,8 @@ There are two things you can do about this warning:
 	smtpmail-debug-info t))
 
 ;; Viewing markdown
-(use-package flymd
-  :ensure t
-
-  :init
-  (defun my-flymd-browser (url)
-    (let ((browse-url-browser-function 'browse-url-firefox))
-      (browse-url url)))
-  (setq flymd-browser-open-function 'my-flymd-browser))
+(use-package markdown-preview-mode
+  :ensure t)
 
 ;; YAML
 (use-package yaml-mode
@@ -500,6 +494,12 @@ There are two things you can do about this warning:
          (typescript-mode . tide-hl-identifier-mode)
          ;(before-save . tide-format-before-save)
          ))
+
+;; Javascript
+(use-package prettier-js
+  :ensure t
+
+  :hook (prettier-js . javascript-mode))
 
 ;; Finally, initialisation
 ;; (add-hook 'emacs-startup-hook
