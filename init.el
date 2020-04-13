@@ -340,6 +340,13 @@ There are two things you can do about this warning:
   :hook ((cider-mode . eldoc-mode)
          (cider-repl-mode . eldoc-mode)))
 
+;; Scheme
+(use-package geiser
+  :ensure t
+
+  :config
+  (setq geiser-active-implementations '(guile)))
+
 ;; Haskell
 (use-package haskell-mode
   :ensure t
@@ -405,7 +412,7 @@ There are two things you can do about this warning:
   :ensure t)
 
 (use-package elpy
-  :after (flycheck py-autopep8 repl-toggle)
+  :after (flycheck repl-toggle)
   :ensure t
 
   :init
@@ -417,8 +424,7 @@ There are two things you can do about this warning:
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
   (setq elpy-rpc-python-command "python3")
 
-  :hook ((elpy-mode . flycheck-mode)
-	       (elpy-mode . py-autopep8-enable-on-save)))
+  :hook ((elpy-mode . flycheck-mode)))
 
 ;; Purescript
 (use-package psci
@@ -465,6 +471,16 @@ There are two things you can do about this warning:
   (flycheck-mode +1)
   (setq flycheck-check-syntax-automatically '(save idle-change mode-enabled)
         flycheck-auto-change-delay 1.5)
+  (let* ((checker 'javascript-eslint)
+         (root (locate-dominating-file
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
+         (eslint (and root
+                      (expand-file-name "node_modules/.bin/eslint"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))
+    (flycheck-select-checker checker))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   (company-mode +1)
@@ -499,7 +515,34 @@ There are two things you can do about this warning:
 (use-package prettier-js
   :ensure t
 
-  :hook (prettier-js . javascript-mode))
+  :hook ((prettier-js . javascript-mode)
+         (prettier-js . web-mode)))
+
+;; SASS
+(use-package sass-mode
+  :ensure t)
+
+;; Web
+(defun setup-web-mode ()
+  "Set up for web mode when not on tsx files.")
+(use-package web-mode
+  :ensure t
+  :mode (("\\.tsx$" . web-mode))
+  :after (flycheck)
+
+  :init
+  (flycheck-mode +1)
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (add-to-list 'flycheck-checkers 'javascript-eslint)
+
+  :hook ((web-mode . (lambda ()
+                       (pcase (file-name-extension buffer-file-name)
+                         ("tsx" (setup-tide-mode))
+                         (_ (setup-web-mode)))))))
+
+;; Ruby
+(use-package ruby-end
+  :ensure t)
 
 ;; Finally, initialisation
 ;; (add-hook 'emacs-startup-hook
