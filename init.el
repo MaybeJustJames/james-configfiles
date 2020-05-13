@@ -67,6 +67,9 @@ There are two things you can do about this warning:
 ;; Use 'y' or 'n' rather than 'yes' or 'no\
 (fset 'yes-or-no-p 'y-or-n-p)
 
+;; Extra help functions
+(load (expand-file-name "~/.emacs.d/help-fns+.el"))
+
 ;; project management
 (use-package projectile
   :ensure t
@@ -216,7 +219,29 @@ There are two things you can do about this warning:
 ;; Enable nice rendering of diagnostics like compile errors.
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode))
+  :init
+  (setq-default flycheck-disabled-checkers '(python-flake8))
+  (global-flycheck-mode)
+
+  :config
+  (flycheck-define-checker python-mypy-custom
+    "Custom version of the mypy checker"
+    :command ("mypy"
+              (config-file "--config-file" flycheck-python-mypy-config)
+              (option "--cache-dir" flycheck-python-mypy-cache-dir)
+              "--ignore-missing-imports"
+              source-original)
+    :error-patterns
+    ((error line-start (file-name) ":" line (optional ":" column)
+            ": error:" (message) line-end)
+     (warning line-start (file-name) ":" line (optional ":" column)
+              ": warning:" (message) line-end)
+     (info line-start (file-name) ":" line (optional ":" column)
+           ": note:" (message) line-end))
+    :modes python-mode
+    :predicate flycheck-buffer-saved-p)
+  (add-to-list 'flycheck-checkers 'python-mypy-custom)
+  (flycheck-add-next-checker 'python-pylint 'python-mypy-custom))
 
 (defun +sidebar-toggle ()
   "Toggle both `dired-sidebar' and `ibuffer-sidebar'."
@@ -517,6 +542,9 @@ There are two things you can do about this warning:
 
   :hook ((prettier-js . javascript-mode)
          (prettier-js . web-mode)))
+
+(use-package rjsx-mode
+  :ensure t)
 
 ;; SASS
 (use-package sass-mode
