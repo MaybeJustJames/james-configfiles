@@ -489,7 +489,20 @@ There are two things you can do about this warning:
   (add-to-list 'company-backends 'company-elm))
 
 
-;; TypeScript
+;; Elixir
+(defun elixir-format-on-save ()
+  "Run elixir-format on save."
+  (add-hook 'before-save-hook 'elixir-format nil t))
+
+(use-package elixir-mode
+  :ensure t
+
+  :hook (elixir-mode . elixir-format-on-save))
+
+(use-package alchemist
+  :ensure t)
+
+;;
 (defun setup-tide-mode ()
   "Tide mode is a bit complicated to set up."
   (interactive)
