@@ -485,6 +485,7 @@ There are two things you can do about this warning:
   ;; :load-path "~/Documents/elm-mode"
   :config
   (setq elm-tags-on-save t)
+  (setq elm-format-on-save t)
   (add-to-list 'company-backends 'company-elm))
 
 
