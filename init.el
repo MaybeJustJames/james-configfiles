@@ -23,10 +23,12 @@
   (setenv "PATH"
           (concat (getenv "PATH")
                   ":" (expand-file-name "~/.local/bin/")
-                  ":" (expand-file-name "~/.npm/bin/")))
+                  ":" (expand-file-name "~/.npm/bin/")
+                  ":" (expand-file-name "~/.cargo/bin/")))
   (setq exec-path
         (append exec-path (list (expand-file-name "~/.local/bin")
-                                (expand-file-name "~/.npm/bin")))))
+                                (expand-file-name "~/.npm/bin")
+                                (expand-file-name "~/.cargo/bin")))))
 
 
 ;; Package management
@@ -408,19 +410,23 @@ There are two things you can do about this warning:
   ; :load-path "~/Documents/lsp-mode"
   ;; Optional - enable lsp-mode automatically in scala files
   :hook ((scala-mode . lsp)
-         (elm-mode . lsp))
-  :config (setq lsp-prefer-flymake nil)
+         (elm-mode . lsp)
+         (rust-mode . lsp))
+  :config
+  (setq lsp-diagnostic-package :flymake)
+  (setq lsp-prefer-capf t)
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
   :commands lsp)
 
 (use-package lsp-ui
   :ensure t
+
+  :bind (([remap xref-find-references] . lsp-ui-peek-find-references)
+         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions))
+
   :commands lsp-ui-mode)
-
-;; Add company-lsp backend for metals
-(use-package company-lsp
-  :ensure t)
-
 
 
 ;; C-type lanaguages
@@ -490,19 +496,33 @@ There are two things you can do about this warning:
 
 
 ;; Elixir
-(defun elixir-format-on-save ()
-  "Run elixir-format on save."
-  (add-hook 'before-save-hook 'elixir-format nil t))
-
 (use-package elixir-mode
   :ensure t
 
-  :hook (elixir-mode . elixir-format-on-save))
+  :config
+  (add-hook 'elixir-mode-hook
+            (lambda () (add-hook 'before-save-hook 'elixit-format nil t))))
 
 (use-package alchemist
   :ensure t)
 
-;;
+;; Rust
+(use-package rust-mode
+  :ensure t
+
+  :config
+  (setq rust-format-on-save t)
+  (setq lsp-rust-server 'rust-analyzer)
+  (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+
+  :bind
+  (("C-c C-c" . rust-run)
+   ("C-c M-l" . rust-run-clippy)))
+
+(use-package flycheck-rust
+  :ensure t)
+
+;; TypeScript
 (defun setup-tide-mode ()
   "Tide mode is a bit complicated to set up."
   (interactive)

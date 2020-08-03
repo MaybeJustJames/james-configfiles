@@ -31,11 +31,13 @@
  '(js-indent-level 2)
  '(lsp-elm-elm-path "/home/jacol/.npm/bin/elm")
  '(lsp-log-io t)
+ '(lsp-ui-doc-position (quote at-point))
+ '(lsp-ui-sideline-show-hover t)
  '(markdown-command "pandoc -f gfm -t html")
  '(org-babel-load-languages (quote ((haskell . t) (emacs-lisp . t))))
  '(package-selected-packages
    (quote
-    (alchemist elixir-mode rjsx-mode geiser web-mode sass-mode ruby-end markdown-preview-mode prettier-js yaml-mode anzu clj-refactor tagedit rainbow-delimiters php-mode elm-mode company-lsp lsp-ui lsp-mode sbt-mode scala-mode idris-mode cider clojure-mode all-the-icons dired-sidebar ibuffer-sidebar tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
+    (flycheck-rust rust-mode alchemist elixir-mode rjsx-mode geiser web-mode sass-mode ruby-end markdown-preview-mode prettier-js yaml-mode anzu clj-refactor tagedit rainbow-delimiters php-mode elm-mode lsp-ui lsp-mode sbt-mode scala-mode idris-mode cider clojure-mode all-the-icons dired-sidebar ibuffer-sidebar tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
  '(safe-local-variable-values (quote ((sgml-basic-offset . 4))))
  '(set-mark-command-repeat-pop t)
  '(typescript-indent-level 2))
