@@ -24,11 +24,13 @@
           (concat (getenv "PATH")
                   ":" (expand-file-name "~/.local/bin/")
                   ":" (expand-file-name "~/.npm/bin/")
-                  ":" (expand-file-name "~/.cargo/bin/")))
+                  ":" (expand-file-name "~/.cargo/bin/")
+                  ":" (expand-file-name "~/.poetry/bin/")))
   (setq exec-path
         (append exec-path (list (expand-file-name "~/.local/bin")
                                 (expand-file-name "~/.npm/bin")
-                                (expand-file-name "~/.cargo/bin")))))
+                                (expand-file-name "~/.cargo/bin")
+                                (expand-file-name "~/.poetry/bin")))))
 
 
 ;; Package management
@@ -382,6 +384,11 @@ There are two things you can do about this warning:
          (haskell-mode . interactive-haskell-mode)
          (haskell-mode . haskell-doc-mode)))
 
+(use-package lsp-haskell
+  :ensure t
+  :config
+  (setq lsp-haskell-process-path-hie "haskell-language-server-wrapper"))
+
 
 ;; Idris
 (use-package idris-mode
@@ -411,7 +418,8 @@ There are two things you can do about this warning:
   ;; Optional - enable lsp-mode automatically in scala files
   :hook ((scala-mode . lsp)
          (elm-mode . lsp)
-         (rust-mode . lsp))
+         (rust-mode . lsp)
+         (haskell-mode . lsp))
   :config
   (setq lsp-diagnostic-package :flymake)
   (setq lsp-prefer-capf t)
@@ -448,7 +456,7 @@ There are two things you can do about this warning:
 
   :init
   (setq python-shell-interpreter "python3"
-	python-shell-interpreter-args "-i")
+        python-shell-interpreter-args "-i")
   (elpy-enable)
 
   :config
@@ -501,7 +509,7 @@ There are two things you can do about this warning:
 
   :config
   (add-hook 'elixir-mode-hook
-            (lambda () (add-hook 'before-save-hook 'elixit-format nil t))))
+            (lambda () (add-hook 'before-save-hook 'elixir-format nil t))))
 
 (use-package alchemist
   :ensure t)
@@ -543,7 +551,7 @@ There are two things you can do about this warning:
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   (company-mode +1)
-  (setq typescript-indent-level 2
+  (setq typescript-indent-level 4
         typescript-expr-indent-offset 0))
 
 (use-package typescript-mode

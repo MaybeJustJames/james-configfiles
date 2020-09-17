@@ -18,7 +18,7 @@
  '(elm-tags-on-save t)
  '(elpy-modules
    (quote
-    (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-sane-defaults)))
+    (elpy-module-company elpy-module-eldoc elpy-module-folding elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-sane-defaults)))
  '(flycheck-checker-error-threshold 1000)
  '(flycheck-python-flake8-executable "python3")
  '(flycheck-python-mypy-executable "python3")
@@ -37,7 +37,10 @@
  '(org-babel-load-languages (quote ((haskell . t) (emacs-lisp . t))))
  '(package-selected-packages
    (quote
-    (flycheck-rust rust-mode alchemist elixir-mode rjsx-mode geiser web-mode sass-mode ruby-end markdown-preview-mode prettier-js yaml-mode anzu clj-refactor tagedit rainbow-delimiters php-mode elm-mode lsp-ui lsp-mode sbt-mode scala-mode idris-mode cider clojure-mode all-the-icons dired-sidebar ibuffer-sidebar tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
+    (lsp-haskell flycheck-rust rust-mode alchemist elixir-mode rjsx-mode geiser web-mode sass-mode ruby-end markdown-preview-mode prettier-js yaml-mode anzu clj-refactor tagedit rainbow-delimiters php-mode elm-mode lsp-ui lsp-mode sbt-mode scala-mode idris-mode cider clojure-mode all-the-icons dired-sidebar ibuffer-sidebar tide projectile repl-toggle psc-ide psci purescript-mode py-autopep8 flycheck elpy mu4e use-package indium js2-mode ghc haskell-mode slime paredit multiple-cursors magit klere-theme ggtags color-theme-solarized atom-dark-theme arc-dark-theme ample-theme)))
+ '(python-shell-extra-pythonpaths
+   (quote
+    ("/usr/lib/python3/dist-packages" "/usr/lib/python3/dist-packages/pip" "/usr/lib/python3/dist-packages/jedi")))
  '(safe-local-variable-values (quote ((sgml-basic-offset . 4))))
  '(set-mark-command-repeat-pop t)
  '(typescript-indent-level 2))
