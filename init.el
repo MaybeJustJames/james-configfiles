@@ -22,12 +22,14 @@
 (eval-when-compile
   (setenv "PATH"
           (concat (getenv "PATH")
+                  ":" (expand-file-name "~/.ghcup/bin/")
                   ":" (expand-file-name "~/.local/bin/")
                   ":" (expand-file-name "~/.npm/bin/")
                   ":" (expand-file-name "~/.cargo/bin/")
                   ":" (expand-file-name "~/.poetry/bin/")))
   (setq exec-path
-        (append exec-path (list (expand-file-name "~/.local/bin")
+        (append exec-path (list (expand-file-name "~/.ghcup/bin")
+                                (expand-file-name "~/.local/bin")
                                 (expand-file-name "~/.npm/bin")
                                 (expand-file-name "~/.cargo/bin")
                                 (expand-file-name "~/.poetry/bin")))))
@@ -63,7 +65,6 @@ There are two things you can do about this warning:
   (require 'use-package))
 
 
-
 ;; Customize
 (setq custom-file "~/.emacs.d/.emacs-customize.el")
 (load custom-file)
@@ -73,6 +74,10 @@ There are two things you can do about this warning:
 
 ;; Extra help functions
 (load (expand-file-name "~/.emacs.d/help-fns+.el"))
+
+;; Org mode js fix
+(setq org-babel-js-function-wrapper
+        "console.log(require('util').inspect(function(){\n%s\n}(), { depth: 100 }))")
 
 ;; project management
 (use-package projectile
@@ -144,6 +149,7 @@ There are two things you can do about this warning:
 	smtpmail-stream-type 'ssl
 	smtpmail-smtp-service 465
 	smtpmail-debug-info t))
+
 
 ;; Viewing markdown
 (use-package markdown-preview-mode
@@ -279,7 +285,8 @@ There are two things you can do about this warning:
   :ensure t
 
   :config
-  (global-set-key (kbd "C-x g") 'magit-status))
+  (global-set-key (kbd "C-x g") 'magit-status)
+  (global-set-key (kbd "C-c g") 'magit-file-dispatch))
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters
@@ -292,6 +299,40 @@ There are two things you can do about this warning:
           clojure-mode
           cider-repl-mode) . rainbow-delimiters-mode))
 
+;; Language server protocol
+(use-package lsp-mode
+  :ensure t
+  :hook ((scala-mode . lsp)
+         (elm-mode . lsp)
+         (rust-mode . lsp)
+         (haskell-mode . lsp))
+  :config
+  (setq lsp-completion-provider :capf)
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+
+  :commands lsp)
+
+(use-package lsp-ui
+  :ensure t
+
+  :bind (([remap xref-find-references] . lsp-ui-peek-find-references)
+         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions))
+
+  :commands lsp-ui-mode)
+
+(use-package lsp-treemacs
+  :ensure t
+  :commands lsp-treemacs-errors-list)
+
+;; Nix + JSON
+(use-package json-mode
+  :ensure t)
+
+(use-package nix-mode
+  :ensure t)
+
+;; HTML
 (use-package tagedit
   :ensure t
   :demand
@@ -411,31 +452,6 @@ There are two things you can do about this warning:
    'self-insert-command
    minibuffer-local-completion-map))
 
-;; Language server protocol
-(use-package lsp-mode
-  :ensure t
-  ; :load-path "~/Documents/lsp-mode"
-  ;; Optional - enable lsp-mode automatically in scala files
-  :hook ((scala-mode . lsp)
-         (elm-mode . lsp)
-         (rust-mode . lsp)
-         (haskell-mode . lsp))
-  :config
-  (setq lsp-diagnostic-package :flymake)
-  (setq lsp-prefer-capf t)
-  (setq gc-cons-threshold 100000000)
-  (setq read-process-output-max (* 1024 1024)) ;; 1mb
-
-  :commands lsp)
-
-(use-package lsp-ui
-  :ensure t
-
-  :bind (([remap xref-find-references] . lsp-ui-peek-find-references)
-         ([remap xref-find-definitions] . lsp-ui-peek-find-definitions))
-
-  :commands lsp-ui-mode)
-
 
 ;; C-type lanaguages
 (add-hook 'c-mode-common-hook
@@ -451,7 +467,7 @@ There are two things you can do about this warning:
   :ensure t)
 
 (use-package elpy
-  :after (flycheck repl-toggle)
+  :after (repl-toggle)
   :ensure t
 
   :init
@@ -461,6 +477,7 @@ There are two things you can do about this warning:
 
   :config
   (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+  (setq elpy-modules (delq 'elpy-module-folding elpy-modules))
   (setq elpy-rpc-python-command "python3")
 
   :hook ((elpy-mode . flycheck-mode)))
