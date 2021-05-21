@@ -85,6 +85,7 @@ There are two things you can do about this warning:
 
   :config
   (projectile-mode +1)
+  (setq projectile-project-search-path '("~/projects/" "~/vib/"))
 
   :bind
   (("C-c p" . projectile-command-map)))
