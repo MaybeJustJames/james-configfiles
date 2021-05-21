@@ -24,7 +24,7 @@
  '(flycheck-python-pycompile-executable "python3")
  '(flycheck-python-pylint-executable "python3")
  '(haskell-font-lock-symbols t)
- '(haskell-process-type 'stack-ghci)
+ '(haskell-process-type 'cabal-repl)
  '(haskell-stylish-on-save t)
  '(idris-interpreter-path "/home/jacol/.cabal/bin/idris")
  '(js-indent-level 2)
