@@ -169,7 +169,6 @@ There are two things you can do about this warning:
 (setq-default indent-tabs-mode nil
               tab-width 2
               indicate-empty-lines nil)
-;;(global-hl-line-mode 1)
 
 (defun my-prog-mode-setup ()
   "General customisation for programming modes."
