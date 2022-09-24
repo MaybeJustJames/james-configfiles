@@ -236,6 +236,12 @@
   :ensure t
   :commands lsp-treemacs-errors-list)
 
+(use-package format-all
+  :ensure t
+
+  :hook ((prog-mode . format-all-mode)
+         (format-all-mode . format-all-ensure-formatter)))
+
 ;; Nix + JSON
 (use-package json-mode
   :ensure t)
