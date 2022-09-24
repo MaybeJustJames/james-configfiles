@@ -89,8 +89,10 @@
 
 (add-hook 'prog-mode-hook #'my-prog-mode-setup)
 
-  :bind
-  (("C-c p" . projectile-command-map)))
+;; Devdocs
+(use-package devdocs
+  :ensure t
+  :bind (("C-h D" . devdocs-lookup)))
 
 ;; Change active window
 (use-package windmove
