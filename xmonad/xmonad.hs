@@ -9,7 +9,7 @@ import qualified XMonad.StackSet as W
 import XMonad.Util.EZConfig (additionalKeys)
 import XMonad.Util.Run (spawnPipe)
 
-myWorkspaces = ["1:web", "2:dev", "3:shell", "4:talk", "5:notes"] ++ map show [6 .. 9]
+myWorkspaces = ["1:web", "2:dev", "3:shell", "4:talk"] ++ map show [5 .. 9]
 
 myKeys conf@(XConfig {XMonad.modMask = modMask}) =
   M.fromList $
@@ -80,7 +80,6 @@ myStartupHook = do
   spawnOn "3:shell" "xfce4-terminal"
   spawnOn "4:talk" "slack"
   spawnOn "4:talk" "signal-desktop"
-  spawnOn "5:notes" "flatpak run md.obsidian.Obsidian"
 
 main = do
   xmproc <- spawnPipe "xmobar ~/.config/xmobar/xmobarrc"
