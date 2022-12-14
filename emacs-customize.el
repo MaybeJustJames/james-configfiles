@@ -100,10 +100,13 @@
  '(markdown-command "pandoc -f gfm -t html")
  '(org-babel-load-languages '((haskell . t) (emacs-lisp . t) (C . t) (python . t)))
  '(package-selected-packages
-   '(devdocs prettier-js typescript-mode dhall-mode format-all flycheck yasnippet direnv purescript-mode lsp-treemacs org-mode json-mode nix-mode lsp-haskell web-mode sass-mode markdown-preview-mode yaml-mode anzu tagedit rainbow-delimiters elm-mode lsp-ui lsp-mode all-the-icons tide elpy use-package indium js2-mode ghc haskell-mode slime geiser paredit multiple-cursors magit ggtags ample-theme hl-todo))
+   '(mastodon magit-todos cider clojure-mode helm rust-mode devdocs prettier-js typescript-mode dhall-mode format-all flycheck yasnippet direnv purescript-mode lsp-treemacs org-mode json-mode nix-mode lsp-haskell web-mode sass-mode markdown-preview-mode yaml-mode anzu tagedit rainbow-delimiters elm-mode lsp-ui lsp-mode all-the-icons tide elpy use-package indium js2-mode ghc haskell-mode slime geiser paredit multiple-cursors magit ggtags ample-theme hl-todo))
  '(python-shell-extra-pythonpaths
    '("/usr/lib/python3/dist-packages" "/usr/lib/python3/dist-packages/pip" "/usr/lib/python3/dist-packages/jedi"))
- '(safe-local-variable-values '((sgml-basic-offset . 4)))
+ '(safe-local-variable-values
+   '((python-shell-interpreter-args . "run python -i")
+     (python-shell-interpreter . "poetry")
+     (sgml-basic-offset . 4)))
  '(set-mark-command-repeat-pop t)
  '(typescript-indent-level 2))
 (custom-set-faces
