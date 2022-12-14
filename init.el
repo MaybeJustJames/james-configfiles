@@ -195,6 +195,9 @@
   (global-set-key (kbd "C-x g") 'magit-status)
   (global-set-key (kbd "C-c g") 'magit-file-dispatch))
 
+(use-package magit-todos
+  :ensure t)
+
 ;; Rainbow delimiters
 (use-package rainbow-delimiters
   :ensure t
