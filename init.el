@@ -465,5 +465,12 @@
          (yaml-mode . hl-todo-mode)
          (purescript-mode . hl-todo-mode)))
 
+(use-package mastodon
+  :ensure t
+
+  :config
+  (setq mastodon-instance-url "https://aus.social"
+        mastodon-active-user "MaybeJustJames"))
+
 (provide 'init)
 ;;; init.el ends here
