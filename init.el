@@ -214,7 +214,8 @@
          (haskell-mode . lsp)
          (haskell-literate-mode . lsp)
          (purescript-mode . lsp)
-         (typescript-mode . lsp))
+         (typescript-mode . lsp)
+         (rust-mode . lsp))
   :config
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.direnv")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.git")
@@ -309,6 +310,8 @@
   :config
   (setq lsp-haskell-process-path-hie "haskell-language-server-wrapper"))
 
+(use-package rust-mode
+  :ensure t)
 
 ;; C-type lanaguages
 (add-hook 'c-mode-common-hook
