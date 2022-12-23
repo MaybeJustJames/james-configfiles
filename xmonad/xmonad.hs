@@ -3,6 +3,7 @@ import System.IO
 import XMonad
 import XMonad.Actions.SpawnOn
 import XMonad.Config.Xfce
+import XMonad.Core (spawn)
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
 import qualified XMonad.StackSet as W
@@ -80,6 +81,7 @@ myStartupHook = do
   spawnOn "3:shell" "xfce4-terminal"
   spawnOn "4:talk" "slack"
   spawnOn "4:talk" "signal-desktop"
+  spawn "xfce4-panel"
 
 main = do
   xmproc <- spawnPipe "xmobar ~/.config/xmobar/xmobarrc"
