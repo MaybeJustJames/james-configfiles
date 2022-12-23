@@ -104,7 +104,14 @@
  '(python-shell-extra-pythonpaths
    '("/usr/lib/python3/dist-packages" "/usr/lib/python3/dist-packages/pip" "/usr/lib/python3/dist-packages/jedi"))
  '(safe-local-variable-values
-   '((python-shell-interpreter-args . "run python -i")
+   '((typescript-indent-level 2)
+     (sgml-basic-offset 2)
+     (js-indent-level 2)
+     (js2-basic-offset 2)
+     (web-mode-code-indent-offset 2)
+     (web-mode-javascript-indent-offset 2)
+     (web-mode-markup-indent-offset 2)
+     (python-shell-interpreter-args . "run python -i")
      (python-shell-interpreter . "poetry")
      (sgml-basic-offset . 4)))
  '(set-mark-command-repeat-pop t)

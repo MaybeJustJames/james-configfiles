@@ -398,13 +398,11 @@
       (setq-local flycheck-javascript-eslint-executable eslint))
     (flycheck-select-checker checker))
   (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  (setq typescript-indent-level 4
-        typescript-expr-indent-offset 0))
+  (tide-hl-identifier-mode +1))
 
 (use-package typescript-mode
   :ensure t
-
+  :mode (("\\.tsx" . typescript-mode))
   :after (flycheck)
 
   :hook ((typescript-mode . setup-tide-mode)))
@@ -416,10 +414,11 @@
 
   :config
   (setq tide-format-options
-        '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
-                                                                :placeOpenBraceOnNewLineForFunctions nil
-                                                                :indentSize 2
-                                                                :tabSize 2))
+        '(
+          :insertSpaceAfterFunctionKeywordForAnonymousFunctions t
+          :placeOpenBraceOnNewLineForFunctions nil
+          :indentSize 2
+          :tabSize 2))
 
   :hook ((typescript-mode . tide-setup)
          (typescript-mode . tide-hl-identifier-mode)
@@ -442,7 +441,7 @@
   "Set up for web mode when not on tsx files.")
 (use-package web-mode
   :ensure t
-  :mode (("\\.tsx$" . web-mode))
+  :mode (("\\.jsx$" . web-mode))
   :after (flycheck)
 
   :init
@@ -450,10 +449,7 @@
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (add-to-list 'flycheck-checkers 'javascript-eslint)
 
-  :hook ((web-mode . (lambda ()
-                       (pcase (file-name-extension buffer-file-name)
-                         ("tsx" (setup-tide-mode))
-                         (_ (setup-web-mode)))))))
+  :hook ((web-mode . (setup-web-mode))))
 
 ;; TODO highlighting
 (use-package hl-todo
