@@ -3,23 +3,6 @@
 
 ;;; Code:
 
-;; Fix backups
-(setq backup-by-copying-when-linked t)
-
-;;Remove interface cruft
-(setq inhibit-splash-screen t
-      inhibit-startup-screen t)
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(toggle-scroll-bar -1)
-
-;;Global useful stuff
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(setq debug-on-error t)
-
 ;; Fix PATH
 (eval-when-compile
   (setenv "PATH"
@@ -29,6 +12,7 @@
                   ":" (expand-file-name "~/.cargo/bin/")
                   ":" (expand-file-name "~/.poetry/bin/")
                   ":" (expand-file-name "~/.pyenv/bin/")
+                  ":" (expand-file-name "~/.pyenv/shims/")
                   ":" (expand-file-name "~/.cabal/bin/")
                   ":" (expand-file-name "~/.nix-profile/bin/")
                   ":" (getenv "PATH")))
@@ -39,44 +23,37 @@
                                 (expand-file-name "~/.cargo/bin")
                                 (expand-file-name "~/.poetry/bin")
                                 (expand-file-name "~/.pyenv/bin")
+                                (expand-file-name "~/.pyenv/shims")
                                 (expand-file-name "~/.cabal/bin")
                                 (expand-file-name "~/.nix-profile/bin")))))
 
 
 ;; Package management
-(require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-			                   ("gnu"   . "https://elpa.gnu.org/packages/")))
-(package-initialize)
+(defvar bootstrap-version)
+(setq straight-use-package-by-default t)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir) user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(straight-use-package 'use-package)
 
-(eval-when-compile
-  (require 'use-package))
-
-
-;; Customize
-(setq custom-file "~/.emacs.d/.emacs-customize.el")
-(load custom-file)
-
-;; Use 'y' or 'n' rather than 'yes' or 'no\
-(fset 'yes-or-no-p 'y-or-n-p)
-
-;; General dev
-(setq column-number-mode t)
-(setq c-default-style "linux"
-      c-basic-offset 2)
-(setq-default indent-tabs-mode nil
-              tab-width 2
-              indicate-empty-lines nil)
 
 (defun my-prog-mode-setup ()
   "General customisation for programming modes."
   (hs-minor-mode 1) ;; Fold code with C-c @ C-c
   (display-line-numbers-mode)
   (prettify-symbols-mode)
+  (electric-pair-mode)
 
   ;; Special setup for HTML+ and tagedit
   (if (string= "mhtml-mode" major-mode)
@@ -91,12 +68,12 @@
 
 ;; Devdocs
 (use-package devdocs
-  :ensure t
+  :straight t
   :bind (("C-h D" . devdocs-lookup)))
 
 ;; Change active window
 (use-package windmove
-  :ensure nil
+  :straight nil
   :bind (("C-s-<left>" . windmove-left)
          ("C-s-<right>" . windmove-right)
          ("C-s-<up>" . windmove-up)
@@ -104,7 +81,7 @@
 
 ;; Theme
 (use-package ample-theme
-  :ensure t
+  :straight t
   :init (progn (load-theme 'ample t t)
 		           (enable-theme 'ample))
 
@@ -112,29 +89,28 @@
 
 ;; Show number of search matches
 (use-package anzu
-  :ensure t
+  :straight t
   :config
   (global-anzu-mode +1))
 
 ;; markdown
 (use-package markdown-preview-mode
-  :ensure t)
+  :straight t)
 
 ;; YAML
 (use-package yaml-mode
-  :ensure t
-
+  :straight t
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
 
 (use-package paren
+  :straight t
   :config
   (show-paren-mode)
   (setq show-paren-style 'mixed))
 
 (use-package multiple-cursors
-  :ensure t
-
+  :straight t
   :config
   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -142,8 +118,7 @@
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this))
 
 (use-package ggtags
-  :ensure t
-
+  :straight t
   :bind
   (("C-c g s" . ggtags-find-other-symbol)
    ("C-c g h" . ggtags-view-tag-history)
@@ -153,8 +128,7 @@
    ("C-c g u" . ggtags-update-tags)))
 
 (use-package direnv
-  :ensure
-
+  :straight t
   :init
   (add-hook 'prog-mode-hook #'direnv-update-environment)
   :config
@@ -162,7 +136,7 @@
 
 ;; Enable nice rendering of diagnostics like compile errors.
 (use-package flycheck
-  :ensure t
+  :straight t
   :init
   (setq-default flycheck-disabled-checkers '(python-flake8))
   (global-flycheck-mode)
@@ -184,38 +158,119 @@
            ": note:" (message) line-end))
     :modes python-mode
     :predicate flycheck-buffer-saved-p)
-  (add-to-list 'flycheck-checkers 'python-mypy-custom)
-  (flycheck-add-next-checker 'python-pylint 'python-mypy-custom))
+  (add-to-list 'flycheck-checkers 'python-mypy-custom))
 
 ;; Git
 (use-package magit
-  :ensure t
-
+  :straight t
   :config
   (global-set-key (kbd "C-x g") 'magit-status)
   (global-set-key (kbd "C-c g") 'magit-file-dispatch))
 
 (use-package magit-todos
-  :ensure t)
+  :straight t)
 
 ;; Rainbow delimiters
 (use-package rainbow-delimiters
-  :ensure t
+  :straight t
+  :init
+  (progn
+    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)))
 
-  :hook ((emacs-lisp-mode
-          lisp-mode
-          lisp-interaction-mode
-          scheme-mode) . rainbow-delimiters-mode))
+(use-package corfu
+  :straight t
+  :custom
+  (corfu-cycle t)
+  (corfu-auto t)
+  (corfu-auto-prefix 2)
+  (corfu-auto-delay 0.1)
+  (corfu-quit-at-boundary 'separator)
+  (corfu-echo-documentation 0.25)
+  :init
+  (global-corfu-mode))
+
+(use-package emacs
+  :init
+  ;; Customize
+  ;; Fix backups
+  (setq backup-by-copying-when-linked t)
+
+  ;;Remove interface cruft
+  (setq inhibit-splash-screen t
+        inhibit-startup-screen t)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (toggle-scroll-bar -1)
+
+  ;;Global useful stuff
+  (setq load-prefer-newer t)
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (setq debug-on-error t)
+  (put 'downcase-region 'disabled nil)
+
+  (setq custom-file "~/.emacs.d/.emacs-customize.el")
+  (load custom-file)
+
+  ;; Use 'y' or 'n' rather than 'yes' or 'no'
+  (setopt use-short-answers t)
+
+  ;; General dev
+  (setq column-number-mode t)
+  (setq c-default-style "linux"
+        c-basic-offset 2)
+  (setq-default indent-tabs-mode nil
+                tab-width 2
+                indicate-empty-lines nil)
+
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 3)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete))
+
+(use-package cape
+  :straight t)
+
+;; AI Code assistant
+(use-package codeium
+  :straight (codeium :type git :host github :repo "Exafunction/codeium.el")
+  :init
+  (add-to-list 'completion-at-point-functions #'codeium-completion-at-point)
+  (add-hook 'python-mode-hook
+            (lambda ()
+              (setq-local completion-at-point-functions
+                          (list ;(cape-capf-buster #'codeium-completion-at-point)
+                           (cape-capf-buster #'lsp-completion-at-point)
+                           ))))
+  :config
+  (setq use-dialog-box t
+        codeium-mode-line t)
+  (setq codeium-mode-line-enable
+        (lambda (api) (not (memq api '(CancelRequest Heartbeat AcceptCompletion)))))
+  (add-to-list 'mode-line-format '(:eval (car-safe codeium-mode-line)) t))
 
 ;; Language server protocol
 (use-package lsp-mode
-  :ensure t
-  :hook ((elm-mode . lsp)
+  :straight t
+  :custom
+  (lsp-completion-provider :none)
+  (lsp-completion-enable nil)
+  :init
+  (defun my/lsp-mode-setup-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+          '(flex))) ;; Configure flex style
+  :hook ((lsp-completion-mode . my/lsp-mode-setup-completion)
+         (elm-mode . lsp)
          (haskell-mode . lsp)
          (haskell-literate-mode . lsp)
          (purescript-mode . lsp)
          (typescript-mode . lsp)
-         (rust-mode . lsp))
+         (rust-mode . lsp)
+         (python-mode . lsp))
   :config
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.direnv")
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.git")
@@ -227,49 +282,48 @@
   ;;(setq read-process-output-max (* 1024 1024)) ;; 1mb
   ;;(setq lsp-use-plists 1)
   ;;(setq lsp-log-io nil)
+  ;; (add-hook 'completion-at-point-functions
+  ;;           #'codeium-completion-at-point nil 'local)
 
   :commands lsp)
 
 (use-package lsp-ui
-  :ensure t
-
+  :straight t
+  :hook (lsp-mode . lsp-ui-mode)
   :bind (([remap xref-find-references] . lsp-ui-peek-find-references)
          ([remap xref-find-definitions] . lsp-ui-peek-find-definitions))
 
   :commands lsp-ui-mode)
 
 (use-package lsp-treemacs
-  :ensure t
+  :straight t
+  :after lsp
   :commands lsp-treemacs-errors-list)
 
 (use-package format-all
-  :ensure t
-
+  :straight t
   :hook ((prog-mode . format-all-mode)
          (format-all-mode . format-all-ensure-formatter)))
 
 ;; Nix + JSON
 (use-package json-mode
-  :ensure t)
+  :straight t)
 
 (use-package nix-mode
-  :ensure t)
+  :straight t)
 
 ;; HTML
 (use-package tagedit
-  :ensure t
+  :straight t
   :demand
-
   :after (sgml-mode html-mode mhtml-mode)
-
   :config
   (tagedit-add-paredit-like-keybindings)
   (tagedit-add-experimental-features))
 
 ;; Lisp
 (use-package paredit
-  :ensure t
-
+  :straight t
   :config
   (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 
@@ -280,8 +334,8 @@
 	        scheme-mode) . enable-paredit-mode))
 
 (use-package slime
-  :ensure t
-
+  :straight t
+  :defer t
   :config
   (load (expand-file-name "~/quicklisp/slime-helper.el"))
   (setq inferior-lisp-program "sbcl"))
@@ -289,29 +343,26 @@
 
 ;; Scheme
 (use-package geiser
-  :ensure t
-
+  :straight t
   :config
   (setq geiser-active-implementations '(guile)))
 
 ;; Haskell
 (use-package haskell-mode
-  :ensure t
-
+  :straight t
   :init
   (setq haskell-stylish-on-save nil)
 
   :hook ((haskell-mode . subword-mode)
-         (haskell-mode . interactive-haskell-mode)
          (haskell-mode . haskell-doc-mode)))
 
 (use-package lsp-haskell
-  :ensure t
+  :straight t
   :config
   (setq lsp-haskell-process-path-hie "haskell-language-server-wrapper"))
 
 (use-package rust-mode
-  :ensure t)
+  :straight t)
 
 ;; C-type lanaguages
 (add-hook 'c-mode-common-hook
@@ -324,9 +375,8 @@
 
 ;; Python
 (use-package elpy
+  :straight t
   :after (repl-toggle)
-  :ensure t
-
   :init
   (setq python-shell-interpreter "python3"
         python-shell-interpreter-args "-i")
@@ -341,20 +391,10 @@
 
 ;; Dhall
 (use-package dhall-mode
-  :ensure t)
-
-;; Purescript
-;; (use-package psci
-;;   :ensure t)
-
-;; (use-package psc-ide
-;;   :ensure t
-;;   :config
-;;   (setq psc-ide-use-npm-bin t))
+  :straight t)
 
 (use-package purescript-mode
-  :ensure t
-
+  :straight t
   :bind
   (("C-," . purescript-move-nested-left)
    ("C-." . purescript-move-nested-right))
@@ -369,7 +409,7 @@
 
 ;; Elm
 (use-package elm-mode
-  :ensure t
+  :straight t
   :config
   (setq elm-tags-on-save t
 	      elm-tags-exclude-elm-stuff t
@@ -401,15 +441,14 @@
   (tide-hl-identifier-mode +1))
 
 (use-package typescript-mode
-  :ensure t
+  :straight t
   :mode (("\\.tsx" . typescript-mode))
-  :after (flycheck)
+  :after (flycheck company)
 
   :hook ((typescript-mode . setup-tide-mode)))
 
 (use-package tide
-  :ensure t
-
+  :straight t
   :after (flycheck typescript-mode)
 
   :config
@@ -427,33 +466,34 @@
 
 ;; Javascript
 (use-package prettier-js
-  :ensure t
-
+  :straight t
   :hook ((prettier-js . javascript-mode)
          (prettier-js . web-mode)))
 
 ;; SASS
 (use-package sass-mode
-  :ensure t)
+  :straight t)
 
 ;; Web
-(defun setup-web-mode ()
-  "Set up for web mode when not on tsx files.")
 (use-package web-mode
-  :ensure t
+  :straight t
   :mode (("\\.jsx$" . web-mode))
   :after (flycheck)
 
   :init
   (flycheck-mode +1)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (add-to-list 'flycheck-checkers 'javascript-eslint)
+  (add-to-list 'flycheck-checkers 'javascript-eslint))
 
-  :hook ((web-mode . (setup-web-mode))))
+;; Snippets
+(use-package yasnippet
+  :straight t
+  :config
+  (yas-global-mode 1))
 
 ;; TODO highlighting
 (use-package hl-todo
-  :ensure t
+  :straight t
   :config
   (setq hl-todo-highlight-punctuation ":")
 
@@ -462,8 +502,7 @@
          (purescript-mode . hl-todo-mode)))
 
 (use-package mastodon
-  :ensure t
-
+  :straight t
   :config
   (setq mastodon-instance-url "https://aus.social"
         mastodon-active-user "MaybeJustJames"))
