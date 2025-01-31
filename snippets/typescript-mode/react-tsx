@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: react tsx
+# key: $react
+# --
+
+import React, { useState } from "react";
+
+const ${1:name}: React.FC<{}> = () => {
+    $0
+};

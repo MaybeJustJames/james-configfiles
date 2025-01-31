@@ -11,6 +11,7 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector
    ["#21252B" "#E06C75" "#98C379" "#E5C07B" "#61AFEF" "#C678DD" "#56B6C2" "#ABB2BF"])
+ '(display-line-numbers-type 'relative)
  '(elpy-modules
    '(elpy-module-eldoc elpy-module-pyvenv elpy-module-highlight-indentation elpy-module-yasnippet elpy-module-sane-defaults))
  '(flycheck-checker-error-threshold 1000)
@@ -70,7 +71,8 @@
      ("Reason" bsrefmt)
      ("ReScript" rescript)
      ("Ruby" rufo)
-     ("Rust" rustfmt)
+     ("Rust"
+      (rustfmt "--edition" "2021"))
      ("Scala" scalafmt)
      ("SCSS" prettier)
      ("Shell" shfmt)
@@ -97,14 +99,23 @@
  '(haskell-process-type 'cabal-repl)
  '(js-indent-level 2)
  '(lsp-elm-elm-path "/home/jacol/.npm/bin/elm")
+ '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
  '(markdown-command "pandoc -f gfm -t html")
  '(org-babel-load-languages '((haskell . t) (emacs-lisp . t) (C . t) (python . t)))
  '(package-selected-packages
-   '(mastodon magit-todos cider clojure-mode helm rust-mode devdocs prettier-js typescript-mode dhall-mode format-all flycheck yasnippet direnv purescript-mode lsp-treemacs org-mode json-mode nix-mode lsp-haskell web-mode sass-mode markdown-preview-mode yaml-mode anzu tagedit rainbow-delimiters elm-mode lsp-ui lsp-mode all-the-icons tide elpy use-package indium js2-mode ghc haskell-mode slime geiser paredit multiple-cursors magit ggtags ample-theme hl-todo))
+   '(skerrick mastodon magit-todos cider clojure-mode helm rust-mode devdocs prettier-js typescript-mode dhall-mode format-all flycheck yasnippet direnv purescript-mode lsp-treemacs org-mode json-mode nix-mode lsp-haskell web-mode sass-mode markdown-preview-mode yaml-mode anzu tagedit rainbow-delimiters elm-mode lsp-ui lsp-mode all-the-icons tide elpy use-package indium js2-mode ghc haskell-mode slime geiser paredit multiple-cursors magit ggtags ample-theme hl-todo))
  '(python-shell-extra-pythonpaths
    '("/usr/lib/python3/dist-packages" "/usr/lib/python3/dist-packages/pip" "/usr/lib/python3/dist-packages/jedi"))
+ '(python-shell-interpreter "poetry")
+ '(python-shell-interpreter-args "run python -i")
  '(safe-local-variable-values
-   '((typescript-indent-level 2)
+   '((lsp-log-io . t)
+     (format-all-formatters "Haskell" fourmolu)
+     (js2-basic-offset . 2)
+     (web-mode-code-indent-offset . 2)
+     (web-mode-javascript-indent-offset . 2)
+     (web-mode-markup-indent-offset . 2)
+     (typescript-indent-level 2)
      (sgml-basic-offset 2)
      (js-indent-level 2)
      (js2-basic-offset 2)
@@ -121,6 +132,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(font-lock-string-face ((t (:foreground "#f90"))))
  '(line-number-current-line ((t (:inherit line-number :background "DarkGoldenrod4")))))
 (provide 'emacs-customize)
 ;;; emacs-customize.el ends here
